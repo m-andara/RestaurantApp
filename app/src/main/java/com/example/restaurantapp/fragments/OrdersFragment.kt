@@ -7,8 +7,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.restaurantapp.MainActivity
 import com.example.restaurantapp.R
 import com.example.restaurantapp.databinding.FragmentOrdersBinding
+import com.example.restaurantapp.models.Order
 import com.example.restaurantapp.recyclerview.OrdersListAdapter
 import com.example.restaurantapp.repository.RestaurantRepository
 
@@ -16,7 +18,7 @@ class OrdersFragment: Fragment() {
 
     private lateinit var binding: FragmentOrdersBinding
     private val ordersListAdapter = OrdersListAdapter() {
-        onOrderClicked()
+        onOrderClicked(it)
     }
 
     override fun onCreateView(
@@ -45,5 +47,8 @@ class OrdersFragment: Fragment() {
 
         ordersListAdapter.submitList(RestaurantRepository.getOrders())
     }
-    private fun onOrderClicked() {}
+    private fun onOrderClicked(order: Order) {
+        RestaurantRepository.setCurrentOrder(order)
+        (activity as MainActivity).swapFragments(OrderDetailsFragment(), "ORDER_DETAILS")
+    }
 }

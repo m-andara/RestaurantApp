@@ -4,6 +4,6 @@ import java.time.LocalDateTime
 
 data class Order(
     var date: LocalDateTime,
-    var items: MutableMap<Int, Array<String>>,
+    var items: Map<Int, Array<String>>,
     var total: String
 )

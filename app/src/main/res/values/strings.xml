@@ -7,4 +7,5 @@
     <string name="orders_empty">No orders found</string>
     <string name="place_order">Place Order</string>
     <string name="empty_cart">Cart Empty</string>
+    <string name="order_details">Details</string>
 </resources>

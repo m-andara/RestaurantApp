@@ -9,6 +9,8 @@
         android:id="@+id/order_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="24sp"
