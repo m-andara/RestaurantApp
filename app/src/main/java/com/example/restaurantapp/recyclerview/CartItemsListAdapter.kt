@@ -3,12 +3,15 @@ package com.example.restaurantapp.recyclerview
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.restaurantapp.databinding.ItemCartItemsBinding
 import com.example.restaurantapp.repository.RestaurantRepository
 
-class CartItemsListAdapter(val onClick: (itemName: String, actionType: String, id: Int) -> Unit): ListAdapter<Int, CartItemsListAdapter.CartItemsViewHolder>(diffUtil) {
+class CartItemsListAdapter(val onClick: (itemName: String, actionType: String, id: Int) -> Unit): ListAdapter<Int, CartItemsListAdapter.CartItemsViewHolder>(
+    diffUtil
+) {
 
     companion object {
         private val diffUtil = object: DiffUtil.ItemCallback<Int>() {
@@ -39,7 +42,9 @@ class CartItemsListAdapter(val onClick: (itemName: String, actionType: String, i
         }
     }
 
-    class CartItemsViewHolder(private val binding: ItemCartItemsBinding): RecyclerView.ViewHolder(binding.root) {
+    class CartItemsViewHolder(private val binding: ItemCartItemsBinding): RecyclerView.ViewHolder(
+        binding.root
+    ) {
         fun onBind(item: Int, onClick: (itemName: String, actionType: String, id: Int) -> Unit) {
 
             val items = RestaurantRepository.getCart()

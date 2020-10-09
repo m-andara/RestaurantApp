@@ -20,6 +20,7 @@ private var currentItem = MenuItem(
     private var currentCategory = ""
     private var orders = mutableListOf<Order>()
     private var cartItems = mutableMapOf<Int, Array<String>>()
+    private var cartItemsId = mutableSetOf<Int>()
     private var cartTotal: Double = 0.00
     private var currentOrder = Order(
         DateUtils.getCurrentDate(),
@@ -49,6 +50,7 @@ private var currentItem = MenuItem(
 
     private fun resetCart() {
         cartItems.clear()
+        cartItemsId.clear()
         cartTotal = 0.00
     }
 
@@ -111,7 +113,7 @@ private var currentItem = MenuItem(
         } else {
             cartItems[item] = arrayOf(name, "1", price.toString())
         }
-
+        cartItemsId.add(item)
         changeTotal(cartItems[item]?.get(2)?.toDouble() ?: 0.00, "add")
     }
 
@@ -135,7 +137,9 @@ private var currentItem = MenuItem(
         val count = cartItems[item]?.get(1)?.toInt() ?: 0
         val amountChange = price * count
         changeTotal(amountChange, "subtract")
-
+        cartItemsId.removeIf {
+            it == item
+        }
         cartItems.remove(item)
     }
 
@@ -155,5 +159,9 @@ private var currentItem = MenuItem(
 
     fun formatTotal(): String {
         return "%.2f".format(cartTotal)
+    }
+
+    fun getCartItemsId(): List<Int> {
+        return cartItemsId.toList()
     }
 }

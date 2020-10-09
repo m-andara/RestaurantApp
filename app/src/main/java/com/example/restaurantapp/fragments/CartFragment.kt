@@ -6,11 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.restaurantapp.R
 import com.example.restaurantapp.databinding.FragmentCartBinding
 import com.example.restaurantapp.recyclerview.CartItemsListAdapter
 import com.example.restaurantapp.repository.RestaurantRepository
+
 
 class CartFragment: Fragment() {
 
@@ -18,6 +22,24 @@ class CartFragment: Fragment() {
     private val cartItemsListAdapter = CartItemsListAdapter() { name, actionType, itemId ->
         onCartActionClicked(name, actionType, itemId)
     }
+
+    private var itemTouchHelper = ItemTouchHelper(
+        object : ItemTouchHelper.SimpleCallback(
+            0, ItemTouchHelper.LEFT
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: ViewHolder, target: ViewHolder
+            ): Boolean {
+                return true
+            }
+
+            override fun onSwiped(viewHolder: ViewHolder, direction: Int) {
+                val id = RestaurantRepository.getCart().map { it.key }[viewHolder.adapterPosition]
+                RestaurantRepository.deleteFromCart(id)
+                updateCartAdapter()
+            }
+        })
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,14 +53,19 @@ class CartFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        itemTouchHelper.attachToRecyclerView(binding.cartList)
+        updateCartAdapter()
+    }
 
+    private fun updateCartAdapter() {
         if(RestaurantRepository.getCart().isNotEmpty()) {
             setUINonEmptyCart()
         } else {
             setUiEmptyCart()
         }
 
-        cartItemsListAdapter.submitList(RestaurantRepository.getCart().map { it.key })
+        cartItemsListAdapter.submitList(RestaurantRepository.getCartItemsId())
+        cartItemsListAdapter.notifyDataSetChanged()
     }
 
     private fun onCartActionClicked(itemName: String, actionType: String, itemId: Int) {
@@ -54,13 +81,7 @@ class CartFragment: Fragment() {
             }
         }
 
-        cartItemsListAdapter.submitList(RestaurantRepository.getCart().map { it.key })
-        cartItemsListAdapter.notifyDataSetChanged()
-        if(RestaurantRepository.getCart().isEmpty()) {
-            setUiEmptyCart()
-        } else {
-            setUINonEmptyCart()
-        }
+        updateCartAdapter()
     }
 
     private fun setUiEmptyCart() {
@@ -74,14 +95,16 @@ class CartFragment: Fragment() {
     private fun setUINonEmptyCart() {
         binding.apply {
             cartList.adapter = cartItemsListAdapter
-            cartList.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-            cartTotal.text = "Total: ${RestaurantRepository.formatTotal()}"
+            cartList.layoutManager = LinearLayoutManager(
+                context,
+                LinearLayoutManager.VERTICAL,
+                false
+            )
+            cartTotal.text = "Total: $${RestaurantRepository.formatTotal()}"
             addToCart.isVisible = true
             addToCart.setOnClickListener {
                 RestaurantRepository.checkout()
-                cartItemsListAdapter.submitList(RestaurantRepository.getCart().map { it.key })
-                cartItemsListAdapter.notifyDataSetChanged()
-                setUiEmptyCart()
+                updateCartAdapter()
             }
         }
     }
