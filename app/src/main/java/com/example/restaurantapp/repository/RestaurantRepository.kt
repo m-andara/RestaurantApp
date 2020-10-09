@@ -3,7 +3,6 @@ package com.example.restaurantapp.repository
 import com.example.restaurantapp.models.MenuItem
 import com.example.restaurantapp.models.Order
 import com.example.restaurantapp.utils.DateUtils
-import java.util.stream.Collectors.toMap
 
 object RestaurantRepository {
 
@@ -41,10 +40,6 @@ private var currentItem = MenuItem(
     private fun changeTotal(amount: Double, actionType: String) {
         if(actionType == "add") cartTotal += amount
         else cartTotal -= amount
-    }
-
-    fun getTotal(): Double {
-        return cartTotal
     }
 
     private fun addOrder(item: Order) {

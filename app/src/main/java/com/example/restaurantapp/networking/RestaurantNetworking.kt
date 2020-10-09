@@ -1,20 +1,20 @@
 package com.example.restaurantapp.networking
 
-import android.Manifest
-import android.app.Activity
-import android.content.Context
-import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.example.restaurantapp.models.MenuItem
 import com.example.restaurantapp.repository.RestaurantRepository
 import okhttp3.OkHttpClient
+import okhttp3.Request
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 object RestaurantNetworking {
@@ -67,6 +67,22 @@ object RestaurantNetworking {
                 Log.v("Networking", "Error: $t")
             }
 
+        })
+    }
+
+    fun getImage(url: String, onLoad: (Bitmap) -> Unit) {
+        val finalUrl = RestaurantRepository.getBaseUrl() + url.substring(21)
+        val request = Request.Builder().url(finalUrl).build()
+        client.newCall(request).enqueue(object: okhttp3.Callback {
+            override fun onFailure(call: okhttp3.Call, e: IOException) {
+                Log.v("Networking", "Error: $e")
+            }
+
+            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+                if (!response.isSuccessful){}
+                val bitmap = BitmapFactory.decodeStream(response.body?.byteStream())
+                Handler(Looper.getMainLooper()).post { onLoad(bitmap) }
+            }
         })
     }
 
